@@ -1,0 +1,66 @@
+'''
+This is a pre-processing script. It takes the GMB data (spread across 80,000 files and 3000 directories)
+and stores it in a pickle file for easier access from the other python script.
+
+The original data downloaded:
+    http://gmb.let.rug.nl/data.php
+We are using the 2.2.0 version.
+
+'''
+from sklearn.externals import joblib
+import os
+import sys
+from sklearn.model_selection import train_test_split
+
+def convert_gmb_conll(label, prev_label):
+    '''
+    Converts the GMB style label into the CONLL label since this is what our validation/test 
+    data set uses.
+    We are only interested in the labels CONLL uses and ignore everything else (convert to O)
+    
+    This could be improved but it works.
+    '''
+#     {'gpe', 'per', 'org', 'geo-nam'}
+    lbl_map = {'gpe' : 'MISC', 'per' : 'PER', 'org' : 'ORG', 'geo' : 'LOC'}
+    for g, c in lbl_map.items():
+        if label.startswith(g):
+            if prev_label.endswith(c):
+                return 'I-' + c
+            else:
+                return 'B-' + c
+    return 'O'
+
+def read_gmb(gmb_root_dir):
+    X = []
+    y = []
+    tmp_label = ''
+    for root, __subFolders, files in os.walk(gmb_root_dir):
+        for file in files:
+            if file.endswith('.tags'):
+                sent_words = []
+                sent_labels = []
+                for line in open(os.path.join(root, file), encoding = 'utf-8'):
+                    line = line.split()
+                    if len(line) >= 4:
+                        sent_words.append(line[0])
+                        tmp_label = convert_gmb_conll(line[3], tmp_label)
+                        sent_labels.append(tmp_label)
+                X.append(sent_words)
+                y.append(sent_labels)
+    return X,y
+
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print('Usage: Preprocess_GMB gmb-directory')
+        sys.exit(-1)
+        
+    
+    X,y = read_gmb(sys.argv[1])
+    X_train, X_test, y_train, y_test = train_test_split(X,y, test_size = 0.2)
+    gmb = [X_train, X_test, y_train, y_test]
+    joblib.dump(gmb, 'gmb_dataset.joblib')
+# 'D:/NLP/gmb-2.2.0'
+
+
+
