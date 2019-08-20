@@ -1,1 +1,7 @@
 # Artificial-Intelligence
+
+Named Entity Recognition is one of the foremost sequence labelling tasks, where the goal is to spot the names of entities in every sentence. Named entities are phrases that contain the names of persons, organizations, locations, times and quantities. Named entities may be generic proper nouns that see locations or organizations, however they will even be rather more domain-specific, like diseases or genes in NLP .
+
+The dataset: The CoNLL-2003 shared task data files contain four columns separated by a single space. Each word has been put on a separate line and there is an empty line after each sentence. The first item on each line is a word, the second a part-of-speech (POS) tag, the third a syntactic chunk tag and the fourth the named entity tag. The chunk tags and the named entity tags have the format I-TYPE which means that the word is inside a phrase of type TYPE. Only if two phrases of the same type immediately follow each other, the first word of the second phrase will have tag B-TYPE to show that it starts a new phrase. A word with tag O is not part of a phrase.
+
+The deep learning model starts with a simple LSTM which is a type of Recurrent Neural Network, which means that they are ideal for dealing with sequential data. The good thing about LSTMs is that they can learn long-term dependencies, as their structure allows the network to pass or block information from one step to the other. For this project, BiLSTMs are used, and the results are evaluated with F1-scores and precision and recall. 
